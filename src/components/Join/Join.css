@@ -1,0 +1,22 @@
+.join-menu {
+    position: relative;
+    width: 350px;
+    height: 350px;
+    margin: 65px auto 0 auto;
+    text-align: center;
+    background-color: #858585;
+    border: 5px solid #fff;
+    border-radius: 5px;
+}
+
+.join-menu input {
+    display: block;
+    margin: 0 auto;
+}
+
+.join-menu_holder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

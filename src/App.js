@@ -1,24 +1,43 @@
 import logo from './logo.svg';
-import './App.css';
+import './canvas.css';
+import Join from './components/Join/Join';
+import { useState } from 'react';
+import Dashboard from './components/Dashboard/Dashboard';
+import { UserListContextProvider } from './ctx/UserListContext';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import io from 'socket.io-client';
+
+const socket = io.connect("http://localhost:3001");
+
+export const SHAPES = [
+  {
+    id: 1,
+    type: 'circle'
+  },
+  {
+    id: 2,
+    type: 'square'
+  },
+  {
+    id: 3,
+    type: 'rectangle'
+  }
+];
+
+const gameID = 'game1';
 
 function App() {
+  const [isJoined, setIsJoined] = useState(false);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <DndProvider backend={HTML5Backend}>
+      <UserListContextProvider>
+        <div className="canvas">
+          {!isJoined && <Join setIsJoined={setIsJoined} socket={socket} gameID={gameID} />}
+          {isJoined && <Dashboard setIsJoined={setIsJoined} socket={socket} gameID={gameID} />}
+        </div>
+      </UserListContextProvider>
+    </DndProvider>
   );
 }
 
