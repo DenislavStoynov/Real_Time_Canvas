@@ -1,5 +1,6 @@
 import { useDrag, useDrop } from "react-dnd";
-import { useRef } from "react";
+import { useRef, useContext, useState, useEffect } from "react";
+import { UserListContext } from "../../../ctx/UserListContext";
 
 
 export const shapeDimensions = {
@@ -10,7 +11,7 @@ export const shapeDimensions = {
 const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToReplaceId }) => {
 
     const validate = prop === 'dashboardParent';
-
+    
     const shapeStyle = () => {
         if (shape.type === 'circle') return {
             ...shapeDimensions,
@@ -30,7 +31,7 @@ const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToRe
 
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'shape',
-        item: { id: shape.id, type: shape.type, shapeType: shape},
+        item: { id: shape.id, type: shape.type, shapeType: shape },
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
         })

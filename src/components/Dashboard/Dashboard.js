@@ -5,15 +5,14 @@ import { SHAPES } from "../../App";
 import Shape from "./Shape/Shape";
 import Canvas from "./Canvas/Canvas";
 import { useDrop } from "react-dnd";
+import LogoutButton from "./LogoutButton/LogoutButton";
 
 const Dashboard = ({ setIsJoined, socket, gameID }) => {
-    const [change, setChange] = useState(false);
+    const { userList } = useContext(UserListContext);
     const [canvasList, setCanvasList] = useState([]);
     const [itemToReplace, setItemToReplace] = useState(null);
     const [itemToReplaceId, setItemToReplaceId] = useState(null);
     const [newItem, setNewItem] = useState(null);
-    const { setUserList } = useContext(UserListContext);
-    const user = localStorage.getItem('user');
 
     const [{ isOver }, drop] = useDrop(() => ({
         accept: 'shape',
@@ -36,12 +35,6 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
         });
     };
 
-    const leaveRoom = () => {
-        setUserList(prevState => prevState.filter(u => u != user));
-        setIsJoined(false);
-        localStorage.clear();
-    };
-
     const sendDataToServer = (new_item, item_to_replace, item_to_replace_ID) => {
         return {
             new_item,
@@ -51,25 +44,28 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
         };
     };
 
+    const updateCanvas = (new_item, item_to_replace_ID) => {
+        setCanvasList(prevShapes => {
+            const updatedShapeList = prevShapes.map((s, idx) => {
+                if (idx === item_to_replace_ID) {
+                    const item = {
+                        id: new_item.id,
+                        type: new_item.type,
+                        counter: Math.random()
+                    };
+                    s = item
+                };
+                return s;
+            });
+            updatedShapeList.pop();
+            return [...updatedShapeList];
+        });
+    }
+
     useEffect(() => {
         if (newItem && itemToReplace) {
             socket.emit('accept_data', sendDataToServer(newItem, itemToReplace, itemToReplaceId));
-            setChange(true);
-            setCanvasList(prevShapes => {
-                const updatedShapeList = prevShapes.map((s, idx) => {
-                    if (s === itemToReplace && idx === itemToReplaceId) {
-                        const item = {
-                            id: newItem.id,
-                            type: newItem.type,
-                            counter: Math.random()
-                        };
-                        s = item
-                    };
-                    return s;
-                });
-                updatedShapeList.pop();
-                return [...updatedShapeList];
-            });
+            updateCanvas(newItem, itemToReplaceId);
             setNewItem(null)
             setItemToReplace(null)
             setItemToReplaceId(null);
@@ -86,36 +82,23 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
         socket.on("receive_data", async (data) => {
             const shapesData = await data;
             if (shapesData.new_item && shapesData.item_to_replace) {
-                setCanvasList(prevShapes => {
-                    const updatedShapeList = prevShapes.map((s, idx) => {
-                        if (idx === shapesData.item_to_replace_ID) {
-                            const item = {
-                                id: shapesData.new_item.id,
-                                type: shapesData.new_item.type,
-                                counter: Math.random()
-                            };
-                            s = item
-                        };
-                        return s;
-                    });
-                    updatedShapeList.pop();
-                    return [...updatedShapeList];
-                })
+                updateCanvas(shapesData.new_item, shapesData.item_to_replace_ID)
             };
         });
+
     }, [socket])
 
     const extractShapes = () => {
-        return SHAPES.map(shape => <Shape key={shape.id} shape={shape} prop={'dashboardParent'} setNewItem={setNewItem} />)
+        return SHAPES.map(shape => <Shape key={shape.id} shape={shape} prop={'dashboardParent'} setNewItem={setNewItem} />);
     }
 
     return (
         <div>
             <div style={{ display: 'flex', width: '100%', height: '125px', borderBottom: '5px solid #fff' }}>
                 <UserList />
-                <div id='shapes' style={{ width: '80%', display: 'flex', justifyContent: 'space-evenly', margin: 'auto 0' }} onClick={() => { console.log(canvasList) }}>
+                <div id='shapes' style={{ width: '80%', display: 'flex', justifyContent: 'space-evenly', margin: 'auto 0' }}>
                     {extractShapes()}
-                    <button onClick={leaveRoom}>Leave</button>
+                    <LogoutButton socket={socket} setIsJoined={setIsJoined} />
                 </div>
             </div>
             <Canvas canvasList={canvasList} dropRef={drop} setItemToReplace={setItemToReplace} setNewItem={setNewItem} setItemToReplaceId={setItemToReplaceId} />

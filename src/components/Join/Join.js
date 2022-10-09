@@ -1,10 +1,10 @@
 import './Join.css';
-import { useRef, useContext } from 'react';
+import { useRef, useContext, useEffect } from 'react';
 import { UserListContext } from '../../ctx/UserListContext';
 
 const Join = ({ setIsJoined, socket, gameID }) => {
     const user = useRef();
-    const { setUserList } = useContext(UserListContext);
+    const { userList, setUserList } = useContext(UserListContext);
 
     const validateUserInput = (user) => {
         return user.trim().length < 1 ? false : true;
@@ -13,10 +13,20 @@ const Join = ({ setIsJoined, socket, gameID }) => {
     const joinUser = () => {
         if (!validateUserInput(user.current.value)) throw new Error("Field cannot be blank!");
         socket.emit("join_game", gameID, user.current.value);
+        socket.emit("update_users_list", user.current.value);
         setIsJoined(true);
-        setUserList(prevUsers => { prevUsers.push(user.current.value); return prevUsers; });
         localStorage.setItem('user', user.current.value);
-    }
+    };
+
+    useEffect(() => {
+        socket.on("add_user", (data) => {
+            setUserList(prevUsers => {
+                prevUsers.push(data);
+                const filteredUsers = [...new Set(prevUsers)];
+                return [...filteredUsers];
+            })
+        });
+    }, [socket]);
 
     return (
         <div className='join-menu'>
