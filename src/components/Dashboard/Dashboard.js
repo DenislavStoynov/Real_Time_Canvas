@@ -88,8 +88,14 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
 
     }, [socket])
 
+    useEffect(() => {
+        if(userList.length < 2) setCanvasList([]);
+    }, [userList])
+
     const extractShapes = () => {
-        return SHAPES.map(shape => <Shape key={shape.id} shape={shape} prop={'dashboardParent'} setNewItem={setNewItem} />);
+        return userList.length > 1 ?
+            SHAPES.map(shape => <Shape key={shape.id} shape={shape} prop={'dashboardParent'} setNewItem={setNewItem} />) :
+            <h1 style={{ color: "#fff", textAlign: 'center' }}>Waiting for another player...</h1>;
     }
 
     return (
