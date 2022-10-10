@@ -13,19 +13,15 @@ const Join = ({ setIsJoined, socket, gameID }) => {
     const joinUser = () => {
         if (!validateUserInput(user.current.value)) throw new Error("Field cannot be blank!");
         socket.emit("join_game", gameID, user.current.value);
-        socket.emit("update_users_list", user.current.value);
+        socket.emit('add_user_to_list', gameID, user.current.value);
         setIsJoined(true);
         localStorage.setItem('user', user.current.value);
     };
 
     useEffect(() => {
-        socket.on("add_user", (data) => {
-            setUserList(prevUsers => {
-                prevUsers.push(data);
-                const filteredUsers = [...new Set(prevUsers)];
-                return [...filteredUsers];
-            })
-        });
+        socket.on('join_room', (data) => {
+            setUserList(data.users)
+        })
     }, [socket]);
 
     return (

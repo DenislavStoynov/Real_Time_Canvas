@@ -14,6 +14,8 @@ const io = new Server(server, {
     }
 });
 
+let users = [];
+
 io.on('connection', (socket) => {
     console.log(`User Connected: ${socket.id}`);
 
@@ -22,18 +24,18 @@ io.on('connection', (socket) => {
         console.log(`User with username: ${username} joined game with ID ${game}`);
     });
 
-    socket.on("leave_game", (game, username) => {
-        socket.leave(game);
-        console.log(`User with username: ${username} left game`);
+    socket.on('add_user_to_list', (game, user) => {
+        users.push(user);
+        io.to(game).emit('join_room', {
+            users: users
+        })
     })
 
-    socket.on("update_users_list", (user) => {
-        io.sockets.emit('add_user', user);
-    });
-
-    socket.on("get_removed_user", (user) => {
-        io.sockets.emit('remove_user', user);
-    });
+    socket.on("leave_game", (game, user) => {
+        users = users.filter(u => u !== user);
+        io.to(game).emit('remove_user_from_list', users);
+        socket.leave(game);
+    })
 
     socket.on('accept_canvas_data', (data, itemToReplace, gameID) => {
         socket.to(gameID).emit('receive_canvas_data', data, itemToReplace);

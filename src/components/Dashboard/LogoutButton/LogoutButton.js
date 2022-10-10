@@ -8,15 +8,14 @@ const LogoutButton = ({ socket, setIsJoined }) => {
     const user = localStorage.getItem('user');
 
     const leaveRoom = () => {
-        socket.emit("get_removed_user", user);
         socket.emit("leave_game", 'game1', user);
         setIsJoined(false);
         localStorage.clear();
     };
 
     useEffect(() => {
-        socket.on('remove_user', (users) => {
-            setUserList(prevState => prevState.filter(u => u != users))
+        socket.on('remove_user_from_list', (users) => {
+            setUserList(users);
         });
     }, [socket]);
 
