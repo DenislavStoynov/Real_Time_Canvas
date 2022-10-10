@@ -1,7 +1,4 @@
 import { useDrag, useDrop } from "react-dnd";
-import { useRef, useContext, useState, useEffect } from "react";
-import { UserListContext } from "../../../ctx/UserListContext";
-
 
 export const shapeDimensions = {
     width: 85,
@@ -11,7 +8,7 @@ export const shapeDimensions = {
 const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToReplaceId }) => {
 
     const validate = prop === 'dashboardParent';
-    
+
     const shapeStyle = () => {
         if (shape.type === 'circle') return {
             ...shapeDimensions,
@@ -45,11 +42,16 @@ const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToRe
         })
     }));
 
-    const ref = useRef(null);
-    const dndRef = drag(drop(ref));
+    const updateReplaceData = () => {
+        setItemToReplace(shape);
+        setItemToReplaceId(counter);
+    };
 
-    return <div ref={dndRef} style={shapeStyle()} onDrop={() => { setItemToReplace(shape); setItemToReplaceId(counter); }}></div>
+    return <div ref={validate ? drag : drop} style={shapeStyle()} onDrop={updateReplaceData}></div>
 
 };
 
 export default Shape;
+
+// const ref = useRef(null);
+// const dndRef = drag(drop(ref));

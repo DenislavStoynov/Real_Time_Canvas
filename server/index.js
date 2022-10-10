@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const cors = require('cors');
-const {Server} = require('socket.io');
+const { Server } = require('socket.io');
 
 app.use(cors());
 const server = http.createServer(app);
@@ -35,8 +35,8 @@ io.on('connection', (socket) => {
         io.sockets.emit('remove_user', user);
     });
 
-    socket.on('accept_canvas_data', (data, gameID) => {
-        socket.to(gameID).emit('receive_canvas_data', data);
+    socket.on('accept_canvas_data', (data, itemToReplace, gameID) => {
+        socket.to(gameID).emit('receive_canvas_data', data, itemToReplace);
     });
 
     socket.on('accept_data', (data) => {

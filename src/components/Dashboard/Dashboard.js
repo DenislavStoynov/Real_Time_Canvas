@@ -18,20 +18,16 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
         accept: 'shape',
         drop: (item) => addShapeToCanvasList(item.id, item.shapeType.type),
         collect: (monitor) => ({
-            isOver: monitor.isOver(),
+            isOver: monitor.isOver()
         })
-    }))
+    }), [itemToReplace]);
 
     const addShapeToCanvasList = (id, shapeType) => {
         const newShape = SHAPES.filter(shape => shape.id === id);
-        newShape[0] = {
-            id: id,
-            type: shapeType,
-            counter: Math.random()
-        };
-        socket.emit('accept_canvas_data', newShape[0], gameID);
+        newShape[0] = { id: id, type: shapeType, counter: Math.random() };
+        socket.emit('accept_canvas_data', newShape[0], itemToReplace, gameID);
         setCanvasList(prevShapes => {
-            return [...prevShapes, newShape[0]]
+            return itemToReplace ? [...prevShapes] : [...prevShapes, newShape[0]];
         });
     };
 
@@ -57,7 +53,6 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
                 };
                 return s;
             });
-            updatedShapeList.pop();
             return [...updatedShapeList];
         });
     }
@@ -73,9 +68,9 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
     }, [newItem, itemToReplace, itemToReplaceId])
 
     useEffect(() => {
-        socket.on("receive_canvas_data", (data) => {
+        socket.on("receive_canvas_data", (data, item_to_replace) => {
             setCanvasList(prevShapes => {
-                return [...prevShapes, data]
+                return item_to_replace ? [...prevShapes] : [...prevShapes, data]
             });
         });
 
@@ -89,7 +84,7 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
     }, [socket])
 
     useEffect(() => {
-        if(userList.length < 2) setCanvasList([]);
+        if (userList.length < 2) setCanvasList([]);
     }, [userList])
 
     const extractShapes = () => {
@@ -100,7 +95,7 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
 
     return (
         <div>
-            <div style={{ display: 'flex', width: '100%', height: '125px', borderBottom: '5px solid #fff' }}>
+            <div style={{ display: 'flex', width: '100%', height: '125px', borderBottom: '5px solid #fff' }} onClick={() => { console.log(canvasList) }}>
                 <UserList />
                 <div id='shapes' style={{ width: '80%', display: 'flex', justifyContent: 'space-evenly', margin: 'auto 0' }}>
                     {extractShapes()}
