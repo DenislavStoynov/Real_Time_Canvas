@@ -1,9 +1,10 @@
 import './Join.css';
-import { useRef, useContext, useEffect } from 'react';
+import { useRef, useContext, useEffect, useState } from 'react';
 import { UserListContext } from '../../ctx/UserListContext';
 
-const Join = ({ setIsJoined, socket, gameID }) => {
+const Join = ({ setCanvasList, setIsJoined, socket, gameID }) => {
     const user = useRef();
+    const [isUserExists, setIsUserExists] = useState(false);
     const { userList, setUserList } = useContext(UserListContext);
 
     const validateUserInput = (user) => {
@@ -14,13 +15,19 @@ const Join = ({ setIsJoined, socket, gameID }) => {
         if (!validateUserInput(user.current.value)) throw new Error("Field cannot be blank!");
         socket.emit("join_game", gameID, user.current.value);
         socket.emit('add_user_to_list', gameID, user.current.value);
-        setIsJoined(true);
         localStorage.setItem('user', user.current.value);
     };
 
     useEffect(() => {
         socket.on('join_room', (data) => {
-            setUserList(data.users)
+            if (data.error === undefined) {
+                setIsJoined(true);
+                setCanvasList([]);
+                setUserList(data.users);
+                setIsUserExists(false);
+            } else {
+                setIsUserExists(true);
+            }
         })
     }, [socket]);
 
@@ -28,6 +35,7 @@ const Join = ({ setIsJoined, socket, gameID }) => {
         <div className='join-menu'>
             <div className='join-menu_holder'>
                 <input type='text' placeholder='Enter username...' ref={user} />
+                {isUserExists && <p style={{color: '#ff0000'}}>This user already exists!</p>}
                 <button onClick={() => {
                     try {
                         joinUser();

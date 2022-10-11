@@ -25,10 +25,16 @@ io.on('connection', (socket) => {
     });
 
     socket.on('add_user_to_list', (game, user) => {
-        users.push(user);
-        io.to(game).emit('join_room', {
-            users: users
-        })
+        if (!users.includes(user)) {
+            users.push(user);
+            io.to(game).emit('join_room', {
+                users: users
+            });
+        } else {
+            socket.emit('join_room', {
+                error: 'user_exists'
+            });
+        }
     })
 
     socket.on("leave_game", (game, user) => {

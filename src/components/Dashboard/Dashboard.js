@@ -7,9 +7,8 @@ import Canvas from "./Canvas/Canvas";
 import { useDrop } from "react-dnd";
 import LogoutButton from "./LogoutButton/LogoutButton";
 
-const Dashboard = ({ setIsJoined, socket, gameID }) => {
+const Dashboard = ({ canvasList, setCanvasList, setIsJoined, socket, gameID }) => {
     const { userList } = useContext(UserListContext);
-    const [canvasList, setCanvasList] = useState([]);
     const [itemToReplace, setItemToReplace] = useState(null);
     const [itemToReplaceId, setItemToReplaceId] = useState(null);
     const [newItem, setNewItem] = useState(null);
