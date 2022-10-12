@@ -2,7 +2,7 @@ import './Join.css';
 import { useRef, useContext, useEffect, useState } from 'react';
 import { UserListContext } from '../../ctx/UserListContext';
 
-const Join = ({ setCanvasList, setIsJoined, socket, gameID }) => {
+const Join = ({ setIsJoined, socket, gameID }) => {
     const user = useRef();
     const [isUserExists, setIsUserExists] = useState(false);
     const { userList, setUserList } = useContext(UserListContext);
@@ -17,14 +17,13 @@ const Join = ({ setCanvasList, setIsJoined, socket, gameID }) => {
         socket.emit('add_user_to_list', gameID, user.current.value);
         localStorage.setItem('user', user.current.value);
     };
-
+    
     useEffect(() => {
         socket.on('join_room', (data) => {
             if (data.error === undefined) {
                 setIsJoined(true);
-                setCanvasList([]);
-                setUserList(data.users);
                 setIsUserExists(false);
+                setUserList(data.users)
             } else {
                 setIsUserExists(true);
             }

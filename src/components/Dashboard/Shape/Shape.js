@@ -1,8 +1,9 @@
 import { useDrag, useDrop } from "react-dnd";
+import { useRef } from "react";
 
 export const shapeDimensions = {
-    width: 85,
-    height: 85
+    width: 90,
+    height: 90
 };
 
 const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToReplaceId }) => {
@@ -20,7 +21,7 @@ const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToRe
             backgroundColor: '#00ff00'
         }
         return {
-            width: shapeDimensions.width * 2,
+            width: shapeDimensions.width,
             height: shapeDimensions.height,
             backgroundColor: '#ffa500'
         }
@@ -28,7 +29,7 @@ const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToRe
 
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'shape',
-        item: { id: shape.id, type: shape.type, shapeType: shape },
+        item: validate ? { id: shape.id, type: shape.type } : {id: shape.id, type: shape.type, blockId: counter},
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
         })
@@ -47,11 +48,11 @@ const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToRe
         setItemToReplaceId(counter);
     };
 
-    return <div ref={validate ? drag : drop} style={shapeStyle()} onDrop={updateReplaceData}></div>
+    const ref2 = useRef(null);
+    const dndRef = drag(drop(ref2));
+
+    return <div ref={dndRef} style={shapeStyle()} onDrop={updateReplaceData}></div>
 
 };
 
 export default Shape;
-
-// const ref = useRef(null);
-// const dndRef = drag(drop(ref));

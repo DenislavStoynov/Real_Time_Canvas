@@ -29,14 +29,12 @@ const gameID = 'game1';
 
 function App() {
   const [isJoined, setIsJoined] = useState(false);
-  const [canvasList, setCanvasList] = useState([]);
-
   return (
     <DndProvider backend={HTML5Backend}>
       <UserListContextProvider>
         <div className="canvas">
-          {!isJoined && <Join setCanvasList={setCanvasList} setIsJoined={setIsJoined} socket={socket} gameID={gameID} />}
-          {isJoined && <Dashboard canvasList={canvasList} setCanvasList={setCanvasList} setIsJoined={setIsJoined} socket={socket} gameID={gameID} />}
+          {!isJoined && <Join setIsJoined={setIsJoined} socket={socket} gameID={gameID} />}
+          {isJoined && <Dashboard setIsJoined={setIsJoined} socket={socket} gameID={gameID} />}
         </div>
       </UserListContextProvider>
     </DndProvider>
