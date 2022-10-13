@@ -7,9 +7,8 @@ import Canvas from "./Canvas/Canvas";
 import { useDrop } from "react-dnd";
 import LogoutButton from "./LogoutButton/LogoutButton";
 
-const Dashboard = ({ setIsJoined, socket, gameID }) => {
+const Dashboard = ({ canvasList, setCanvasList, setIsJoined, socket, gameID }) => {
     const { userList } = useContext(UserListContext);
-    const [canvasList, setCanvasList] = useState([]);
     const [itemToReplace, setItemToReplace] = useState(null);
     const [itemToReplaceId, setItemToReplaceId] = useState(null);
     const [newItem, setNewItem] = useState(null);
@@ -24,7 +23,6 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
     };
 
     const updateCanvas = (new_item, item_to_replace_ID) => {
-        console.log(item_to_replace_ID)
         setCanvasList(prevShapes => {
             const updatedShapeList = prevShapes.map((s) => {
                 if (s.blockId === item_to_replace_ID) {
@@ -33,27 +31,44 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
                         type: new_item.type,
                         blockId: item_to_replace_ID
                     };
-                    s = item
+                    s = item;
                 };
                 return s;
             });
+            console.log(updatedShapeList);
             return [...updatedShapeList];
         });
     }
 
     useEffect(() => {
-        if (newItem && itemToReplace) {
+        if (newItem && itemToReplaceId) {
             socket.emit('accept_data', sendDataToServer(newItem, itemToReplace, itemToReplaceId));
             updateCanvas(newItem, itemToReplaceId);
-            setNewItem(null)
+            setNewItem(null);
             setItemToReplace(null)
             setItemToReplaceId(null);
         }
     }, [newItem, itemToReplace, itemToReplaceId])
 
     useEffect(() => {
-        socket.on("receive_canvas_data", (data, item_to_replace) => {
+        socket.on("receive_canvas_data", (data, item_to_replace, item) => {
             setCanvasList(prevShapes => {
+                if (item.blockId && !item_to_replace) {
+                    const updateShapes = prevShapes.map(u => {
+                        if (u.blockId === item.blockId) {
+                            data.id = u.id;
+                            data.type = u.type;
+                            const item = { ...data };
+                            u = item;
+                        }
+                        return u;
+                    });
+                    return [...updateShapes];
+                }
+                if (item.blockId && item_to_replace) {
+                    const updateShapes = prevShapes.filter(u => u.blockId != item.blockId);
+                    return [...updateShapes];
+                }
                 return item_to_replace ? [...prevShapes] : [...prevShapes, data]
             });
         });
@@ -72,10 +87,9 @@ const Dashboard = ({ setIsJoined, socket, gameID }) => {
     }, [userList])
 
     const extractShapes = () => {
-        // return userList.length > 1 ?
-        //     SHAPES.map(shape => <Shape key={shape.id} shape={shape} prop={'dashboardParent'} setNewItem={setNewItem} />) :
-        //     <h1 style={{ color: "#fff", textAlign: 'center' }}>Waiting for another player...</h1>;
-        return SHAPES.map(shape => <Shape key={shape.id} shape={shape} prop={'dashboardParent'} setNewItem={setNewItem} />);
+        return userList.length > 1 ?
+            SHAPES.map(shape => <Shape key={shape.id} shape={shape} prop={'dashboardParent'} setNewItem={setNewItem} />) :
+            <h1 style={{ color: "#fff", textAlign: 'center' }}>Waiting for another player...</h1>;
     }
 
     return (

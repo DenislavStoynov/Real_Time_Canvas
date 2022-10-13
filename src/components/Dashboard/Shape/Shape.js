@@ -6,7 +6,7 @@ export const shapeDimensions = {
     height: 90
 };
 
-const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToReplaceId }) => {
+const Shape = ({ shape, prop, setItemToReplace, setNewItem, blockId, setItemToReplaceId }) => {
 
     const validate = prop === 'dashboardParent';
 
@@ -29,7 +29,7 @@ const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToRe
 
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'shape',
-        item: validate ? { id: shape.id, type: shape.type } : {id: shape.id, type: shape.type, blockId: counter},
+        item: { id: shape.id, type: shape.type, blockId: blockId },
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
         })
@@ -44,14 +44,16 @@ const Shape = ({ shape, prop, setItemToReplace, setNewItem, counter, setItemToRe
     }));
 
     const updateReplaceData = () => {
-        setItemToReplace(shape);
-        setItemToReplaceId(counter);
+        if (shape.blockId !== undefined) {
+            setItemToReplace(shape);
+            setItemToReplaceId(blockId);
+        }
     };
 
-    const ref2 = useRef(null);
-    const dndRef = drag(drop(ref2));
+    const ref = useRef(null);
+    const dndRef = drag(drop(ref));
 
-    return <div ref={dndRef} style={shapeStyle()} onDrop={updateReplaceData}></div>
+    return <div ref={dndRef} style={shapeStyle()} onDrop={updateReplaceData} onDragStart={()=>{console.log(console.log(shape))}}></div>
 
 };
 

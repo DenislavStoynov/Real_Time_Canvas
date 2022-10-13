@@ -2,7 +2,7 @@ import './Join.css';
 import { useRef, useContext, useEffect, useState } from 'react';
 import { UserListContext } from '../../ctx/UserListContext';
 
-const Join = ({ setIsJoined, socket, gameID }) => {
+const Join = ({ setCanvasList, setIsJoined, socket, gameID }) => {
     const user = useRef();
     const [isUserExists, setIsUserExists] = useState(false);
     const { userList, setUserList } = useContext(UserListContext);
@@ -23,7 +23,8 @@ const Join = ({ setIsJoined, socket, gameID }) => {
             if (data.error === undefined) {
                 setIsJoined(true);
                 setIsUserExists(false);
-                setUserList(data.users)
+                setUserList(data.users);
+                setCanvasList([]);
             } else {
                 setIsUserExists(true);
             }

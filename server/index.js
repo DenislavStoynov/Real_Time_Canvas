@@ -43,8 +43,8 @@ io.on('connection', (socket) => {
         socket.leave(game);
     })
 
-    socket.on('accept_canvas_data', (data, itemToReplace, gameID) => {
-        socket.to(gameID).emit('receive_canvas_data', data, itemToReplace);
+    socket.on('accept_canvas_data', (data, itemToReplace, item, gameID) => {
+        socket.to(gameID).emit('receive_canvas_data', data, itemToReplace, item);
     });
 
     socket.on('accept_data', (data) => {
