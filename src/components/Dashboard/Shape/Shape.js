@@ -6,9 +6,7 @@ export const shapeDimensions = {
     height: 90
 };
 
-const Shape = ({ shape, prop, setItemToReplace, setNewItem, blockId, setItemToReplaceId }) => {
-
-    const validate = prop === 'dashboardParent';
+const Shape = ({ shape, setItemToReplace, setNewItem, blockId, setItemToReplaceId }) => {
 
     const shapeStyle = () => {
         if (shape.type === 'circle') return {
@@ -53,7 +51,7 @@ const Shape = ({ shape, prop, setItemToReplace, setNewItem, blockId, setItemToRe
     const ref = useRef(null);
     const dndRef = drag(drop(ref));
 
-    return <div ref={dndRef} style={shapeStyle()} onDrop={updateReplaceData} onDragStart={()=>{console.log(console.log(shape))}}></div>
+    return <div ref={dndRef} style={shapeStyle()} onDrop={updateReplaceData}></div>
 
 };
 
