@@ -74,14 +74,7 @@ const Dashboard = ({ canvasList, setCanvasList, setIsJoined, socket, gameID }) =
                         .map(u => { if (u.blockId === item.blockId) u.blockId = data.blockId; return u; });
                     return [...updateShapes];
                 }
-                if(!item.blockId && item_to_replace) {
-                    const updateShapes = prevShapes.map(u => {
-                        if(u.blockId === item_to_replace.blockId) u = {...data};
-                        return u;
-                    })
-                    return [...updateShapes];
-                }
-                return [...prevShapes, data]
+                return item_to_replace ? [...prevShapes] : [...prevShapes, data]
             });
         });
 
