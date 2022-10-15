@@ -6,6 +6,26 @@ import Shape from "./Shape/Shape";
 import Canvas from "./Canvas/Canvas";
 import LogoutButton from "./LogoutButton/LogoutButton";
 
+export const moveShapeAroundCanvas = (shapeList, nItem, oItem) => {
+    const updateShapes = shapeList.map(u => {
+        if (u.blockId === oItem.blockId) {
+            nItem.id = u.id;
+            nItem.type = u.type;
+            const item = { ...nItem };
+            u = item;
+        }
+        return u;
+    });
+    return updateShapes;
+};
+
+export const replaceShapeOnCanvas = (shapeList, itp, oItem, nItem) => {
+    const updateShapes = shapeList
+        .filter(u => u.blockId != itp.blockId)
+        .map(u => { if (u.blockId === oItem.blockId) u.blockId = nItem.blockId; return u; });
+    return updateShapes;
+};
+
 const Dashboard = ({ canvasList, setCanvasList, setIsJoined, socket, gameID }) => {
     const { userList } = useContext(UserListContext);
     const [itemToReplace, setItemToReplace] = useState(null);
@@ -56,23 +76,10 @@ const Dashboard = ({ canvasList, setCanvasList, setIsJoined, socket, gameID }) =
     useEffect(() => {
         socket.on("receive_canvas_data", (data, item_to_replace, item) => {
             setCanvasList(prevShapes => {
-                if (item.blockId !== undefined && !item_to_replace) {
-                    const updateShapes = prevShapes.map(u => {
-                        if (u.blockId === item.blockId) {
-                            data.id = u.id;
-                            data.type = u.type;
-                            const item = { ...data };
-                            u = item;
-                        }
-                        return u;
-                    });
-                    return [...updateShapes];
-                }
-                if (item.blockId !== undefined && item_to_replace) {
-                    const updateShapes = prevShapes
-                        .filter(u => u.blockId != item_to_replace.blockId)
-                        .map(u => { if (u.blockId === item.blockId) u.blockId = data.blockId; return u; });
-                    return [...updateShapes];
+                let res = null;
+                if (item.blockId !== undefined) {
+                    res = !item_to_replace ? moveShapeAroundCanvas(prevShapes, data, item) : replaceShapeOnCanvas(prevShapes, item_to_replace, item, data);
+                    return [...res];
                 }
                 return item_to_replace ? [...prevShapes] : [...prevShapes, data]
             });

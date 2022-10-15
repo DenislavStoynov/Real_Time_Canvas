@@ -1,6 +1,7 @@
 import Shape, { shapeDimensions } from "../Shape/Shape"
 import { SHAPES } from "../../../App";
 import { useDrop } from "react-dnd";
+import { moveShapeAroundCanvas, replaceShapeOnCanvas } from "../Dashboard";
 
 const CanvasBlock = ({ blockId, setCanvasList, itemToReplace, canvasList, setItemToReplace, setNewItem, setItemToReplaceId, itemToReplaceId, newItem, socket, gameID }) => {
     const shape = canvasList.find(s => s.blockId === blockId);
@@ -18,23 +19,10 @@ const CanvasBlock = ({ blockId, setCanvasList, itemToReplace, canvasList, setIte
         newShape[0] = { ...newShape[0], blockId: blockId };
         socket.emit('accept_canvas_data', newShape[0], itemToReplace, item, gameID);
         setCanvasList(prevShapes => {
-            if (item.blockId !== undefined && !itemToReplace) {
-                const updateShapes = prevShapes.map(u => {
-                    if (u.blockId === item.blockId) {
-                        newShape[0].id = u.id;
-                        newShape[0].type = u.type;
-                        const item2 = { ...newShape[0] };
-                        u = item2;
-                    }
-                    return u;
-                })
-                return [...updateShapes];
-            }
-            if (item.blockId !== undefined && itemToReplace) {
-                const updateShapes = prevShapes
-                    .filter(u => u.blockId != itemToReplace.blockId)
-                    .map(u => { if (u.blockId === item.blockId) u.blockId = newShape[0].blockId; return u; });
-                return [...updateShapes];
+            let res = null;
+            if(item.blockId !== undefined) {
+                res = !itemToReplace ? moveShapeAroundCanvas(prevShapes, newShape[0], item) : replaceShapeOnCanvas(prevShapes, itemToReplace, item, newShape[0]);
+                return [...res];
             }
             return itemToReplace ? [...prevShapes] : [...prevShapes, newShape[0]];
         })

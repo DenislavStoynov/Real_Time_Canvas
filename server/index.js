@@ -17,7 +17,7 @@ const io = new Server(server, {
 let users = [];
 
 io.on('connection', (socket) => {
-    console.log(`User Connected: ${socket.id}`);
+    // console.log(`User Connected: ${socket.id}`);
 
     socket.on("join_game", (game, username) => {
         socket.join(game);
@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
     socket.on("leave_game", (game, user) => {
         users = users.filter(u => u !== user);
         io.to(game).emit('remove_user_from_list', users);
-        socket.leave(game);
+        // socket.leave(game);
     })
 
     socket.on('accept_canvas_data', (data, itemToReplace, item, gameID) => {
