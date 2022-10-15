@@ -74,7 +74,7 @@ const Dashboard = ({ canvasList, setCanvasList, setIsJoined, socket, gameID }) =
     }, [newItem, itemToReplace, itemToReplaceId])
 
     useEffect(() => {
-        socket.on("receive_canvas_data", (data, item_to_replace, item) => {
+        socket.off("receive_canvas_data").on("receive_canvas_data", (data, item_to_replace, item) => {
             setCanvasList(prevShapes => {
                 let res = null;
                 if (item.blockId !== undefined) {
@@ -102,15 +102,15 @@ const Dashboard = ({ canvasList, setCanvasList, setIsJoined, socket, gameID }) =
         return userList.length > 1 ?
             SHAPES.map(shape => <Shape key={shape.id} shape={shape} setNewItem={setNewItem} />) :
             <h1 style={{ color: "#fff", textAlign: 'center' }}>Waiting for another player...</h1>;
-    }
+    };
 
     return (
         <div>
-            <div style={{ display: 'flex', width: '100%', height: '125px', borderBottom: '5px solid #fff' }} onClick={() => { console.log(canvasList) }}>
+            <div style={{ display: 'flex', width: '100%', height: '125px', borderBottom: '5px solid #fff' }}>
                 <UserList />
                 <div id='shapes' style={{ width: '80%', display: 'flex', justifyContent: 'space-evenly', margin: 'auto 0' }}>
                     {extractShapes()}
-                    <LogoutButton socket={socket} setIsJoined={setIsJoined} />
+                    <LogoutButton socket={socket} setIsJoined={setIsJoined} setCanvasList={setCanvasList} />
                 </div>
             </div>
             <Canvas canvasList={canvasList} itemToReplace={itemToReplace} setCanvasList={setCanvasList}

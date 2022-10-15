@@ -35,7 +35,7 @@ function App() {
     <DndProvider backend={HTML5Backend}>
       <UserListContextProvider>
         <div className="canvas">
-          {!isJoined && <Join setCanvasList={setCanvasList} setIsJoined={setIsJoined} socket={socket} gameID={gameID} />}
+          {!isJoined && <Join isJoined={isJoined} setCanvasList={setCanvasList} setIsJoined={setIsJoined} socket={socket} gameID={gameID} />}
           {isJoined && <Dashboard canvasList={canvasList} setCanvasList={setCanvasList} setIsJoined={setIsJoined} socket={socket} gameID={gameID} />}
         </div>
       </UserListContextProvider>

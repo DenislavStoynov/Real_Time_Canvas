@@ -5,7 +5,7 @@ import { UserListContext } from '../../ctx/UserListContext';
 const Join = ({ setCanvasList, setIsJoined, socket, gameID }) => {
     const user = useRef();
     const [isUserExists, setIsUserExists] = useState(false);
-    const { userList, setUserList } = useContext(UserListContext);
+    const { setUserList } = useContext(UserListContext);
 
     const validateUserInput = (user) => {
         return user.trim().length < 1 ? false : true;
