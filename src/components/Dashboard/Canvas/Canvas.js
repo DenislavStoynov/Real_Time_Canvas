@@ -1,11 +1,9 @@
 import CanvasBlock from "../CanvasBlock/CanvasBlock";
-import Shape from "../Shape/Shape";
-import { useEffect } from "react";
 
 const Canvas = ({ canvasList, setCanvasList, itemToReplace, setItemToReplace, newItem, setNewItem, itemToReplaceId, setItemToReplaceId, socket, gameID }) => {
     const pageHeight = window.innerHeight - 131;
     const canvasWidth = window.innerWidth;
-    const totalBlocks = Math.floor(canvasWidth / 90) * Math.floor(pageHeight / 90);
+    const totalBlocks = Math.floor(canvasWidth / 91) * Math.floor(pageHeight / 91);
 
     const getAllBlocks = () => {
         const canvasBlockArr = [];
